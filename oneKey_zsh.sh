@@ -47,6 +47,7 @@ install_centos(){
         sudo yum install python-pip -y
 
         install_autojump
+        yum intall autojump-zsh -y  # centos7 只安装autojump是无法全用的
 }
 
 install_macOS(){
