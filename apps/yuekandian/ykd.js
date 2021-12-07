@@ -82,6 +82,7 @@ function ykdck() {
         const ykdhd = JSON.stringify($request.headers)
         if (ykdhd) $.setdata(ykdhd, `ykdhd${status}`)
         $.log(ykdhd)
+        $.msg(ykdhd)
         $.msg($.name, "", `悦看点${status}headers获取成功`)
     }
 }
