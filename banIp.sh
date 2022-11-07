@@ -1,3 +1,4 @@
+#!/bin/bash
 cat /var/log/auth.log | awk '/Invalid/{print $(NF-2)}' | sort | uniq -c | awk '{print $2"="$1}' > /tmp/black 
 list=`cat /tmp/black`
 #cat /tmp/black >> /opt/scripts/banIp.log
