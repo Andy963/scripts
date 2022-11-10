@@ -1,0 +1,23 @@
+#!/bin/sh
+#
+# An example hook script to verify what is about to be committed.
+# Called by "git commit" with no arguments.  The hook should
+# exit with non-zero status after issuing an appropriate message if
+# it wants to stop the commit.
+#
+# To enable this hook, rename this file to "pre-commit".
+
+global_email=$(git config --global user.email)
+global_name=$(git config --global user.name)
+
+repository_email=$(git config user.email)
+repository_name=$(git config user.name)
+
+# prohibit use global email, global name to commit 
+if [ "$global_name" == "$repository_email" ];then
+   echo "ERROR: [pre-commit hook] Aborting commit becase user.email is equal to global email, please change or config it."
+   exit 1
+else  
+    # user.email is not empty
+    exit 0
+fi 
