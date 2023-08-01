@@ -29,8 +29,10 @@ apt_conf=/etc/apt/apt.conf.d/proxy.conf
 # Backup existing file
 if [ -f "${apt_conf}.bak" ]; then
   rm ${apt_conf}.bak
+else
+  sudo touch $apt_conf
 fi
-cp $apt_conf ${apt_conf}.bak
+sudo cp $apt_conf ${apt_conf}.bak
 #Acquire::http::Proxy "http://127.0.0.1:8080/";
 # Acquire::https::Proxy "http://127.0.0.1:8080/";
 # Update the /etc/apt/apt.conf.d/proxy.conf file
@@ -42,6 +44,8 @@ echo "modify apt proxy success"
 weget_conf=~/.wgetrc
 if [ -f "${weget_conf}" ]; then
   rm ${weget_conf}.bak
+else
+  sudo touch $weget_conf
 fi
 cp ${weget_conf} ${weget_conf}.bak
 echo "use_proxy=yes" | sudo tee $weget_conf >/dev/null
@@ -53,6 +57,8 @@ echo "modify wget proxy success"
 curl_conf=~/.curlrc
 if [ -f "${curl_conf}" ]; then
   rm ${curl_conf}.bak
+else
+  sudo touch $curl_conf
 fi
 cp ${curl_conf} ${curl_conf}.bak
 echo "socks5=\"${host_ip}:${port}\"" | sudo tee $curl_conf >/dev/null
@@ -62,6 +68,8 @@ echo "modify curl proxy success"
 git_conf=~/.ssh/config
 if [ -f "${git_conf}" ]; then
   rm ${git_conf}.bak
+  esle
+  sudo touch $git_conf
 fi
 cp ${git_conf} ${git_conf}.bak
 echo "ProxyCommand nc --proxy-type socks5 --proxy ${host}:${port} %h %p" | sudo tee -a $git_conf >/dev/null
