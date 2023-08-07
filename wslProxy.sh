@@ -65,12 +65,5 @@ echo "socks5=\"${host_ip}:${port}\"" | sudo tee $curl_conf >/dev/null
 echo "modify curl proxy success"
 
 # git
-git_conf=~/.ssh/config
-if [ -f "${git_conf}" ]; then
-  rm ${git_conf}.bak
-  esle
-  sudo touch $git_conf
-fi
-cp ${git_conf} ${git_conf}.bak
-echo "ProxyCommand nc --proxy-type socks5 --proxy ${host}:${port} %h %p" | sudo tee -a $git_conf >/dev/null
+git config --global http.proxy http://${host_ip}:${port}
 echo "modify git proxy success"
