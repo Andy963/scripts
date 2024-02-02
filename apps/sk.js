@@ -26,7 +26,6 @@ async function main() {
             console.log(`随机延迟${user.getRandomTime()}ms`);
             await user.getRecord();
             await user.signin();
-            await user.signEx();
             await user.sp();
             await user.cx();  //\n视频任务:${$.spp}\n
             DoubleLog(`签到:${$.signMsg}-本次获得：${user.curAward}积分:共：${user.totalAward}积分！\n`);
@@ -84,6 +83,8 @@ class UserInfo {
                 $.signMsg = `${result?.msg}`;
                 this.curAward += result?.data?.award;
                 this.signinStatus = true;
+                $.log(`尝试获取签到额外奖励：`);
+                await this.signEx();
             } else {
                 $.log(`❌签到失败!${result?.msg}`);
             }
@@ -94,10 +95,6 @@ class UserInfo {
 
  //签到额外
     async signEx() {
-        if (!this.signinStatus) {
-            $.signMsg = "还未签到，无法领取"
-            return
-        }
         try {
             const options = {
                 //签到任务调用签到接口
