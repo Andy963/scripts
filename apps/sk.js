@@ -131,7 +131,7 @@ class UserInfo {
         try {
             const options = {
                 //签到任务调用签到接口
-                url: `https://wemp.issks.com/lottery/v1/welfare/taskSubmit`
+                url: `https://wemp.issks.com/lottery/v1/welfare/taskSubmit`,
                 //请求头, 所有接口通用
                 headers: {
                     'Accept-Encoding': "gzip,compress,br,deflate",
@@ -141,7 +141,7 @@ class UserInfo {
                     'Referer': "https://servicewechat.com/wx9a52264f55a86ce1/78/page-frame.html",
                     'Host': "wemp.issks.com",
                 },
-                `{"taskId":34}`
+                body: `{"taskId":34}`
             };
             let result = await httpRequest(options);
             if (result?.success) {
