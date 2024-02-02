@@ -78,7 +78,8 @@ class UserInfo {
             let result = await httpRequest(options);
             console.log(result)
             if (result?.success) {
-                $.log(`✅签到成功！${result?.msg}`);
+                $.log(`✅签到成功！${result?.msg},开始获取额外奖励`);
+                this.signEx();
                 $.log(`获得${result?.data?.award}积分！`);
                 $.signMsg = `${result?.msg}`;
                 this.curAward += result?.data?.award;
@@ -91,9 +92,8 @@ class UserInfo {
         }
     }
 
-
-    //视频任务函数
-    async sp() {
+ //签到额外
+    async signEx() {
         try {
             const options = {
                 //签到任务调用签到接口
@@ -111,7 +111,37 @@ class UserInfo {
             //post方法
             let result = await httpRequest(options);
             if (result?.success) {
-                $.log(`✅领取成功！${result?.msg}`);
+                $.log(`✅领取签到额外奖励成功！${result?.msg}`);
+                $.se = `${result?.msg}`;
+                this.curAward += 60;
+            } else {
+                $.log(`❌领取失败!${result?.msg}`);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    //视频任务函数
+    async sp() {
+        try {
+            const options = {
+                //签到任务调用签到接口
+                url: `https://wemp.issks.com/lottery/v1/welfare/taskSubmit`
+                //请求头, 所有接口通用
+                headers: {
+                    'Accept-Encoding': "gzip,compress,br,deflate",
+                    "Content-Type": "application/json;charset=utf-8",
+                    "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.44(0x18002c2f) NetType/WIFI Language/zh_CN",
+                    "token": this.token,
+                    'Referer': "https://servicewechat.com/wx9a52264f55a86ce1/78/page-frame.html",
+                    'Host': "wemp.issks.com",
+                },
+                `{"taskId":34}`
+            };
+            let result = await httpRequest(options);
+            if (result?.success) {
+                $.log(`✅视频观看领取成功！${result?.msg}`);
                 $.spp = `${result?.msg}`;
                 this.curAward += 60;
             } else {
