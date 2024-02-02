@@ -55,6 +55,7 @@ class UserInfo {
     //签到函数
     async signin() {
         if (this.signinStatus) {
+            $.signMsg = "已经签到过了"
             $.log(`✅账号${this.index} >> 今天已签到过!`);
             return
         }
@@ -109,7 +110,6 @@ class UserInfo {
             };
             //post方法
             let result = await httpRequest(options);
-            console.log(result)
             if (result?.success) {
                 $.log(`✅领取成功！${result?.msg}`);
                 $.spp = `${result?.msg}`;
@@ -173,7 +173,7 @@ class UserInfo {
                     'Referer': "https://servicewechat.com/wx9a52264f55a86ce1/78/page-frame.html",
                     'Host': "wemp.issks.com",
                 },
-                body: {}
+                body: `{}`
             };
             //post方法
             let result = await httpRequest(options);
