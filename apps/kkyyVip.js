@@ -9,8 +9,7 @@ const $ = new Env("可可英语Vip");
             let apTime = getTimeStr();
             let serverTimestamp = Math.floor(apTime/1000);
             let delta = apTime - serverTimestamp;
-            console.log(apTime,serverTimestamp,delta)
-            return JSON.stringify({
+            let body = {
                   "Token" : "",
                   "Error" : "",
                   "Code" : 200,
@@ -31,7 +30,25 @@ const $ = new Env("可可英语Vip");
                   "ServerTimestamp" : serverTimestamp,
                   "Delta_T" : delta,
                   "IsDecode" : 0
-            })
+            }
+            let d1, d2 = getExpireStr();
+            const options = {
+                url: `https://mob2015.kekenet.com/keke/mobile/index.php`,
+                headers: {
+                      'Date': `${d1}`,
+                      'Content-Type': 'application/json;charset=utf-8',
+                      'Transfer-Encoding': 'chunked', 
+                      'Connection': 'keep-alive',
+                      'Expires': `${d2}`,
+                      'Vary': 'Accept-Encoding',
+                      'X-Powered-By': 'PHP/5.6.40',
+                      'Cache-Control': 'max-age=7200', 
+                      'Content-Encoding': 'gzip',
+                      'X-Ser': 'BC209_dx-lt-yd-jiangsu-taizhou-4-cache-12, BC5_lt-shan3xi-xian-19-cache-1'
+                },
+                body: JSON.stringify(body)
+            };
+            return httpResponse(options)
         }
     }
 })()
@@ -44,6 +61,11 @@ const $ = new Env("可可英语Vip");
 function padZero(n) {
     // 小于10时自动补0
     return n < 10 ? '0' + n : n;
+}
+function getExpireStr(){
+    let d = new Date();
+    let new_d = d.setHours(d.getHours() + 2);
+    return d.toUTCString(), new_d.toUTCString()
 }
 
 function getTimeStr() {
