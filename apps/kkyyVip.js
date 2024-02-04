@@ -9,6 +9,7 @@ const $ = new Env("可可英语Vip");
             let apTime = getTimeStr();
             let serverTimestamp = Math.floor(apTime/1000);
             let delta = apTime - serverTimestamp;
+            console.log(apTime,serverTimestamp,delta)
             return {
                 {
                   "Token" : "",
