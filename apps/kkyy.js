@@ -14,13 +14,17 @@ let userCount = 0;
 //获取Token
 async function getCookie() {
     if ($request && $request.method != 'OPTIONS') {
-        console.log(typeof $request.body);
         const body = JSON.parse($request.body);
+        if(body['Method'] !== 'customer_sign'){
+            $.done(); 
+            return;
+        };
         const tokenValue = body['Token'];
         const uid = body['UID'];
         const sign = body['Sign'];
         if (tokenValue && uid) {
             $.setdata({"UID": uid, "Token": tokenValue, "Sign": sign}, ckName);
+            $.log('data',{"UID": uid, "Token": tokenValue, "Sign": sign});
             $.msg($.name, "", "获取签到Token成功🎉");
         } else {
             $.msg($.name, "", "错误获取签到Token失败");
@@ -169,7 +173,6 @@ async function main() {
         if (user.ckStatus) {
             //ck未过期，开始执行任务
             // DoubleLog(`🔷账号${user.index} >> Start work`)
-            console.log(`随机延迟${user.getRandomTime()}ms`);
             await user.cx();
             await user.signin();
         } else {
@@ -185,6 +188,7 @@ async function main() {
     if (
         typeof $request != "undefined") {
         await getCookie();
+        $.done(); 
         return;
     }
 
