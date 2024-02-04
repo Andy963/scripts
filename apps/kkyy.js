@@ -14,12 +14,13 @@ let userCount = 0;
 //获取Token
 async function getCookie() {
     if ($request && $request.method != 'OPTIONS') {
-        const tokenValue = $request.body['Token'];
-        const uid = $request.body['UID'];
-        const sign = $request.body['Sign'];
+        console.log(typeof $request.body);
+        const body = JSON.parse($request.body);
+        const tokenValue = body['Token'];
+        const uid = body['UID'];
+        const sign = body['Sign'];
         if (tokenValue && uid) {
             $.setdata({"UID": uid, "Token": tokenValue, "Sign": sign}, ckName);
-            console.log(tokenValue);
             $.msg($.name, "", "获取签到Token成功🎉");
         } else {
             $.msg($.name, "", "错误获取签到Token失败");
