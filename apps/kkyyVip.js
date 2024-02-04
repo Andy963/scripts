@@ -1,208 +1,39 @@
-// env.js 全局
-const $ = new Env("可可英语签到");
-const ckName = "kk_tk";
-//-------------------- 一般不动变量区域 -------------------------------------
-const Notify = 1;//0为关闭通知,1为打开通知,默认为1
-const notify = $.isNode() ? require('./sendNotify') : '';
-let envSplitor = ["@"]; //多账号分隔符
-let userCookie = ($.isNode() ? process.env[ckName] : $.getdata(ckName)) || '';
-let userList = [];
-let userIdx = 0;
-let userCount = 0;
 
-//获取Token
-async function getCookie() {
-    if ($request && $request.method != 'OPTIONS') {
-        const body = JSON.parse($request.body);
-        if(body['Method'] !== 'customer_getmoresetting'){
-            return;
-        };
-        const tokenValue = body['Token'];
-        const uid = body['UID'];
-        const sign = body['Sign'];
-        if (tokenValue && uid) {
-            $.setdata({"UID": uid, "Token": tokenValue, "Sign": sign}, ckName);
-            $.log('data',{"UID": uid, "Token": tokenValue, "Sign": sign});
-            $.msg($.name, "", "获取签到Token成功🎉");
-        } else {
-            $.msg($.name, "", "错误获取签到Token失败");
-        }
-    }
-}
-
-//检查变量
-async function checkEnv() {
-    if (userCookie) {
-        // console.log(userCookie);
-        let e = envSplitor[0];
-        for (let o of envSplitor)
-            if (userCookie.indexOf(o) > -1) {
-                e = o;
-                break;
-            }
-        
-        let userCookiesArray = userCookie.split(e);
-        for (let i = 0; i < userCookiesArray.length; i++) {
-            let data = userCookiesArray[i];
-            let n = JSON.parse(data)
-            if (n) {
-                userList.push(new UserInfo(n['UID'],n['Token'],n['Sign']));
-            }
-        }
-        userCount = userList.length;
-    } else {
-        console.log("未找到token");
-        return;
-    }
-    return console.log(`共找到${userCount}个账号`), true;//true == !0
-}
-
-class UserInfo {
-    constructor(uid, token, sign,apVersion,version,versionCode) {
-        this.index = ++userIdx;
-        this.uid = uid;
-        this.sign = sign || "c00dda77d2c16df052516fdc603005a6";
-        this.token = token; // 用户token
-        this.apVersion = apVersion || "4.9.6";
-        this.version = version || "4.0";
-        this.versionCode = versionCode || "496";
-        this.signinStatus = false; // 是否签到过
-        this.ckStatus = true;
-    }
-
-    //查询签到情况
-    async cx() {
-        try {
-            let body = {
-                    "UID": `${this.uid}`,
-                    "Token": `${this.token}`,
-                    "Terminal": "1",
-                    "ApVersion": `${this.apVersion}`,
-                    "Method": "customer_getmoresetting",
-                    "Version": `${this.version}`,
-                    "AppFlag": 0,
-                    "Sign": `${this.sign}`,
-                    "ApTime": `${getTimeStr()}`,
-                    "ApVersionCode": `${this.versionCode}`,
-                };
-            const options = {
-                url: `https://mob2015.kekenet.com/keke/mobile/index.php`,
-                headers: {
-                    'Accept': `*/*`,
-                    'Accept-Encoding': `gzip, deflate, br`,
-                    'Connection': `keep-alive`,
-                    'Content-Type': `application/json`,
-                    'Host': `mob2015.kekenet.com`,
-                    'User-Agent': `KeKeEnglish/4.9.6 (iPhone; iOS 16.5; Scale/2.00)`,
-                    'Accept-Language': `en-CN;q=1, zh-Hans-CN;q=0.9`
-                },
-                body: JSON.stringify(body)
-            };
-            //post方法
-            let result = await httpRequest(options);
-            if (result?.Code === 200) {
-                let data = result?.Data;
-                let levelInfo = data?.levelinfo;
-                let total = levelInfo?.total
-                let level = levelInfo?.level
-                let title = levelInfo.title
-                let signNum = data?.singnum;
-                let username = data?.username;
-                let todaySign = data?.todaysign === 1;
-                if (todaySign) {
-                    this.signinStatus = true;
-                }
-                $.log(`✅查询成功:\n ${username} 等级：${level}, ${title},本月签到次数：${signNum}次，总可豆： ${total}, ${todaySign ? "已签到" : "未签到"}`);
-            } else {
-                $.log(`❌查询失败!${result?.Msg}`)
-            }
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
-
-    async signin() {
-        if (this.signinStatus) {
-            $.signMsg = "已经签到过了"
-            console.log(`✅账号${this.index} >> 今天已签到过!`);
-            return
-        }
-        try {
-            let body = {
-                    "UID": `${this.uid}`,
-                    "Params": {},
-                    "Token": `${this.token}`,
-                    "Terminal": "1",
-                    "ApVersion": `${this.apVersion}`,
-                    "Method": "customer_sign",
-                    "Version": `${this.version}`,
-                    "AppFlag": 0,
-                    "Sign": `${this.sign}`,
-                    "ApTime": `${getTimeStr()}`,
-                    "ApVersionCode": `${this.apVersionCode}`,
-                };
-            const options = {
-                //签到任务调用签到接口
-                url: `https://mob2015.kekenet.com/keke/mobile/index.php`,
-                //请求头, 所有接口通用
-                headers: {
-                    'Accept': `*/*`,
-                    'Accept-Encoding': `gzip, deflate, br`,
-                    'Connection': `keep-alive`,
-                    'Content-Type': `application/json`,
-                    'Host': `mob2015.kekenet.com`,
-                    'User-Agent': `KeKeEnglish/4.9.6 (iPhone; iOS 16.5; Scale/2.00)`,
-                    'Accept-Language': `en-CN;q=1, zh-Hans-CN;q=0.9`
-                },
-                body: JSON.stringify(body)
-            };
-            //post方法
-            let result = await httpRequest(options);
-            console.log(result)
-            if (result?.Code === 200) {
-                $.log(`✅签到成功！获得${result?.Data?.point}积分！`);
-                $.signMsg = `${result?.msg}`;
-                this.signinStatus = true;
-            } else {
-                $.log(`❌签到失败!${result?.Msg}`);
-            }
-        } catch (e) {
-            console.log(e);
-        }
-    }
-}
-
-//脚本入口函数main()
-async function main() {
-    console.log('\n================== 可可英语签到任务 ==================\n');
-    for (let user of userList) {
-        if (user.ckStatus) {
-            //ck未过期，开始执行任务
-            // DoubleLog(`🔷账号${user.index} >> Start work`)
-            await user.cx();
-            await user.signin();
-        } else {
-            //将ck过期消息存入消息数组
-            $.notifyMsg.push(`❌账号${user.index} >> Check ck error!`)
-        }
-    }
-}
 
 //主程序执行入口
 !(async () => {
     //没有设置变量,执行Cookie获取
-    if (typeof $request != "undefined" && userCookie  === '') {
-        await getCookie();
-        return;
-    }
-//未检测到ck，退出
-    if (!(await checkEnv())) {
-        throw new Error(`❌未检测到token，请添加环境变量`)
-        $.done(); 
-    }
-    if (userList.length > 0) {
-        await main();
+    if (typeof $request != "undefined" ) {
+        let body = JSON.parse($request.body);
+        if(body['Method'] === 'customer_isvip'){
+            let apTime = getTimeStr();
+            let serverTimestamp = Math.floor(apTime/1000);
+            let delta = apTime - serverTimestamp;
+            return {
+                {
+                  "Token" : "",
+                  "Error" : "",
+                  "Code" : 200,
+                  "Msg" : "",
+                  "Data" : {
+                    "is_vip" : 1,
+                    "end_time" : 0,
+                    "expire_notice" : 0,
+                    "expire_time" : 0,
+                    "changxue_end_time" : 0,
+                    "is_platinum" : 0,
+                    "platinum_end_time" : 0,
+                    "subscribe" : 0,
+                    "is_changxue" : 0
+                  },
+                  "Key" : "",
+                  "ApTime" : apTime,
+                  "ServerTimestamp" : serverTimestamp,
+                  "Delta_T" : delta,
+                  "IsDecode" : 0
+                }
+            }
+        }
     }
 })()
     .catch((e) => $.log(e.message || e))//捕获登录函数等抛出的异常, 并把原因添加到全局变量(通知)
@@ -220,7 +51,7 @@ function padZero(n) {
 function getTimeStr() {
     // 获取时间戳
     let d = new Date();
-    return Math.floor(d.getTime()/1000);
+    return d.getTime();
 }
 
 function getCurDate() {
