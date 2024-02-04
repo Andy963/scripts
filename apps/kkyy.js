@@ -1,5 +1,5 @@
 // env.js 全局
-const $ = new Env("可可英语签到");
+const $ = new Env("可可英语");
 const ckName = "kk_tk";
 const checkingName = 'ck'
 //-------------------- 一般不动变量区域 -------------------------------------
@@ -7,6 +7,7 @@ const Notify = 1;//0为关闭通知,1为打开通知,默认为1
 const notify = $.isNode() ? require('./sendNotify') : '';
 let envSplitor = ["@"]; //多账号分隔符
 let userCookie = ($.isNode() ? process.env[ckName] : $.getdata(ckName)) || '';
+$.msg(userCookie,"123")
 let userList = [];
 let userIdx = 0;
 let userCount = 0;
@@ -19,9 +20,10 @@ async function getCookie() {
         const tokenValue = body['Token'];
         const uid = body['UID'];
         const sign = body['Sign'];
-        if (tokenValue && uid) {
-            $.setdata({"UID": uid, "Token": tokenValue, "Sign": sign}, ckName);
-            $.log('data',{"UID": uid, "Token": tokenValue, "Sign": sign});
+let userCookie = ($.isNode() ? process.env[ckName] : $.getdata(ckName)) || '';
+        if (tokenValue && uid && !userCookie) {
+            $.setdata(JSON.stringify({"UID": uid, "Token": tokenValue, "Sign": sign}), ckName);
+            $.msg($.name,"",JSON.stringify({"UID": uid, "Token": tokenValue, "Sign": sign}));
             $.msg($.name, "", "获取签到Token成功🎉");
         } else {
             $.msg($.name, "", "错误获取签到Token失败");
