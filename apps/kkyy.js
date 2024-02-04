@@ -185,8 +185,7 @@ async function main() {
 //主程序执行入口
 !(async () => {
     //没有设置变量,执行Cookie获取
-    if (
-        typeof $request != "undefined") {
+    if (typeof $request != "undefined" && userCookie  === '') {
         await getCookie();
         return;
     }
@@ -194,6 +193,7 @@ async function main() {
 //未检测到ck，退出
     if (!(await checkEnv())) {
         throw new Error(`❌未检测到token，请添加环境变量`)
+        $.done(); 
     }
     if (userList.length > 0) {
         await main();
