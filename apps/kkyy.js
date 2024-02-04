@@ -188,7 +188,6 @@ async function main() {
     if (
         typeof $request != "undefined") {
         await getCookie();
-        $.done(); 
         return;
     }
 
