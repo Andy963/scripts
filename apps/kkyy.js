@@ -90,14 +90,14 @@ class UserInfo {
             let result = await httpRequest(options);
             //console.log(result)
             if (result?.Code === 200) {
-                let data = result ? Data;
+                let data = result?.Data;
                 let levelInfo = data?.levelinfo;
                 let total = levelInfo?.total
                 let level = levelInfo?.level
                 let title = levelInfo.title
                 let signNum = data?.signnum;
                 let username = data?.username;
-                let todaySign = data?.todaysign === 1 ? true : false;
+                let todaySign = data?.todaysign === 1;
                 if (todaySign) {
                     this.signStatus = true;
                 }
@@ -164,7 +164,6 @@ class UserInfo {
 //脚本入口函数main()
 async function main() {
     console.log('\n================== 可可英语签到任务 ==================\n');
-    let taskall = [];
     for (let user of userList) {
         if (user.ckStatus) {
             //ck未过期，开始执行任务
@@ -172,7 +171,6 @@ async function main() {
             console.log(`随机延迟${user.getRandomTime()}ms`);
             await user.cx();
             await user.signin();
-            DoubleLog(`签到:${$.signMsg}-本次获得：${user.curAward}积分:共：${user.totalAward}积分！\n`);
         } else {
             //将ck过期消息存入消息数组
             $.notifyMsg.push(`❌账号${user.index} >> Check ck error!`)
