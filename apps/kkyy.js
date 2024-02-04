@@ -16,7 +16,6 @@ async function getCookie() {
     if ($request && $request.method != 'OPTIONS') {
         const body = JSON.parse($request.body);
         if(body['Method'] !== 'customer_getmoresetting'){
-            $.done(); 
             return;
         };
         const tokenValue = body['Token'];
