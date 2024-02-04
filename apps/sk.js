@@ -125,32 +125,35 @@ class UserInfo {
 
     //视频任务函数
     async sp() {
-        try {
-            const options = {
-                //签到任务调用签到接口
-                url: `https://wemp.issks.com/lottery/v1/welfare/taskSubmit`,
-                //请求头, 所有接口通用
-                headers: {
-                    'Accept-Encoding': "gzip,compress,br,deflate",
-                    "Content-Type": "application/json;charset=utf-8",
-                    "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.44(0x18002c2f) NetType/WIFI Language/zh_CN",
-                    "token": this.token,
-                    'Referer': "https://servicewechat.com/wx9a52264f55a86ce1/78/page-frame.html",
-                    'Host': "wemp.issks.com",
-                },
-                body: `{"taskId":34}`
-            };
-            let result = await httpRequest(options);
-            if (result?.success) {
-                $.log(`✅视频观看领取成功！${result?.msg}`);
-                $.spp = `${result?.msg}`;
-                this.curAward += 60;
-            } else {
-                $.log(`❌领取失败!${result?.msg}`);
+        for(let i=0;i<5;i++){
+            try {
+                const options = {
+                    //签到任务调用签到接口
+                    url: `https://wemp.issks.com/lottery/v1/welfare/taskSubmit`,
+                    //请求头, 所有接口通用
+                    headers: {
+                        'Accept-Encoding': "gzip,compress,br,deflate",
+                        "Content-Type": "application/json;charset=utf-8",
+                        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.44(0x18002c2f) NetType/WIFI Language/zh_CN",
+                        "token": this.token,
+                        'Referer': "https://servicewechat.com/wx9a52264f55a86ce1/78/page-frame.html",
+                        'Host': "wemp.issks.com",
+                    },
+                    body: `{"taskId":34}`
+                };
+                let result = await httpRequest(options);
+                if (result?.success) {
+                    $.log(`✅视频观看领取成功！${result?.msg}`);
+                    $.spp = `${result?.msg}`;
+                    this.curAward += 60;
+                } else {
+                    $.log(`❌领取失败!${result?.msg}`);
+                }
+               await sleep(randomInt(30000,40000));
+            } catch (e) {
+                console.log(e);
             }
-        } catch (e) {
-            console.log(e);
-        }
+         }
     }
 
     async getRecord() {
@@ -262,6 +265,9 @@ async function getCookie() {
     });
 
 /** --------------------------------辅助函数区域------------------------------------------- */
+function sleep(delay = 30000) {
+  return new Promise(resolve => setTimeout(resolve, delay)); 
+}
 
 // 双平台log输出
 function DoubleLog(data) {
