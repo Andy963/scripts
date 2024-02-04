@@ -11,7 +11,6 @@ const $ = new Env("可可英语Vip");
             let delta = apTime - serverTimestamp;
             console.log(apTime,serverTimestamp,delta)
             return {
-                {
                   "Token" : "",
                   "Error" : "",
                   "Code" : 200,
@@ -32,7 +31,6 @@ const $ = new Env("可可英语Vip");
                   "ServerTimestamp" : serverTimestamp,
                   "Delta_T" : delta,
                   "IsDecode" : 0
-                }
             }
         }
     }
