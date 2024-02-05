@@ -8,7 +8,7 @@ const $ = new Env("可可英语Vip");
         if (body['Method'] === 'customer_isvip') {
             let apTime = getTimeStr();
             let serverTimestamp = Math.floor(apTime / 1000);
-            let delta = apTime - serverTimestamp;
+            let delta = serverTimestamp - apTime;
             let body = {
                 "Token": "",
                 "Error": "",
