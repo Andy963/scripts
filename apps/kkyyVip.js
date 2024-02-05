@@ -3,36 +3,40 @@ const $ = new Env("可可英语Vip");
 !(async () => {
     //没有设置变量,执行Cookie获取
     if (typeof $request != "undefined" && $request.method === 'POST') {
-        let body = JSON.parse($request.body);
-        $.log($.name, "", `get body ${body}`);
-        if (body['Method'] === 'customer_isvip') {
-            let apTime = getTimeStr();
-            let serverTimestamp = Math.floor(apTime / 1000);
-            let delta = serverTimestamp - apTime;
-            let body = {
-                "Token": "",
-                "Error": "",
-                "Code": 200,
-                "Msg": "",
-                "Data": {
-                    "is_vip": 1,
-                    "end_time": 0,
-                    "expire_notice": 0,
-                    "expire_time": 0,
-                    "changxue_end_time": 0,
-                    "is_platinum": 0,
-                    "platinum_end_time": 0,
-                    "subscribe": 0,
-                    "is_changxue": 0
-                },
-                "Key": "",
-                "ApTime": apTime,
-                "ServerTimestamp": serverTimestamp,
-                "Delta_T": delta,
-                "IsDecode": 0
+        try {
+            let body = JSON.parse($request.body);
+            $.log($.name, "", `get body ${body}`);
+            if (body['Method'] === 'customer_isvip') {
+                let apTime = getTimeStr();
+                let serverTimestamp = Math.floor(apTime / 1000);
+                let delta = serverTimestamp - apTime;
+                let body = {
+                    "Token": "",
+                    "Error": "",
+                    "Code": 200,
+                    "Msg": "",
+                    "Data": {
+                        "is_vip": 1,
+                        "end_time": getExpireStr(),
+                        "expire_notice": 0,
+                        "expire_time": getExpireStr(),
+                        "changxue_end_time": 0,
+                        "is_platinum": 0,
+                        "platinum_end_time": 0,
+                        "subscribe": 0,
+                        "is_changxue": 0
+                    },
+                    "Key": "",
+                    "ApTime": apTime,
+                    "ServerTimestamp": serverTimestamp,
+                    "Delta_T": delta,
+                    "IsDecode": 0
+                }
+                $.log($.name, "", JSON.stringify(body));
+                return body
             }
-            $.log($.name, "", JSON.stringify(body));
-            return JSON.stringify(body)
+        } catch (e) {
+            $.done();
         }
     }
 })()
@@ -49,8 +53,8 @@ function padZero(n) {
 
 function getExpireStr() {
     let d = new Date();
-    let new_d = d.setHours(d.getHours() + 2);
-    return d.toUTCString(), new_d.toUTCString()
+    let new_d = d.setHours(d.getMonth() + 6);
+    return new_d.getTime();
 }
 
 function getTimeStr() {
