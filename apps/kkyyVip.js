@@ -19,6 +19,5 @@ $done({body: body})
 
 function getExpireStr() {
     let d = new Date();
-    let new_d = d.setMonth(d.getMonth() + 6 + 1);
-    return new_d.getTime();
+    return d.setMonth(d.getMonth() + 6 + 1);
 }
