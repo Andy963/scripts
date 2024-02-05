@@ -14,8 +14,14 @@ function getExpireStr() {
 
 let body = $response.body;
 let obj = JSON.parse(body);
+
+if(obj?.ApTime){
+    obj['ApTime'] = getExpireStr();
+}
+
 if (obj?.Data?.is_vip === 0) {
     obj['Data']['is_changxue'] = 1;
+    obj['subscribe'] = 1;
     obj['Data']['expire_time'] = getExpireStr();
     obj['Data']['changxue_end_time'] = getExpireStr();
 }
