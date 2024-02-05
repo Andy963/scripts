@@ -7,11 +7,11 @@ const Notify = 1;//0为关闭通知,1为打开通知,默认为1
 const notify = $.isNode() ? require('./sendNotify') : '';
 let envSplitor = ["@"]; //多账号分隔符
 let userCookie = ($.isNode() ? process.env[ckName] : $.getdata(ckName)) || '';
-$.msg(userCookie,"123")
+let isChecking = ($.isNode() ? process.env[checkingName] : $.getdata(checkingName)) || false;
 let userList = [];
 let userIdx = 0;
 let userCount = 0;
-let isChecking = ($.isNode() ? process.env[checkingName] : $.getdata(checkingName)) || '';
+
 //获取Token
 async function getCookie() {
     $.setdata(true, checkingName);
@@ -20,14 +20,16 @@ async function getCookie() {
         const tokenValue = body['Token'];
         const uid = body['UID'];
         const sign = body['Sign'];
-let userCookie = ($.isNode() ? process.env[ckName] : $.getdata(ckName)) || '';
         if (tokenValue && uid && !userCookie) {
-            $.setdata(JSON.stringify({"UID": uid, "Token": tokenValue, "Sign": sign}), ckName);
-            $.msg($.name,"",JSON.stringify({"UID": uid, "Token": tokenValue, "Sign": sign}));
+            let data = { "UID": uid, "Token": tokenValue, "Sign": sign }
+            $.setdata(JSON.stringify(data), ckName);
+            userCookie = JSON.stringify(data);
+            $.log($.name, "", JSON.stringify(data));
             $.msg($.name, "", "获取签到Token成功🎉");
         } else {
             $.msg($.name, "", "错误获取签到Token失败");
         }
+    $.setdata(true, checkingName);
     }
 }
 
@@ -41,13 +43,12 @@ async function checkEnv() {
                 e = o;
                 break;
             }
-        
         let userCookiesArray = userCookie.split(e);
         for (let i = 0; i < userCookiesArray.length; i++) {
             let data = userCookiesArray[i];
             let n = JSON.parse(data)
             if (n) {
-                userList.push(new UserInfo(n['UID'],n['Token'],n['Sign']));
+                userList.push(new UserInfo(uid = n['UID'], token = n['Token'], sign = n['Sign']));
             }
         }
         userCount = userList.length;
@@ -59,14 +60,14 @@ async function checkEnv() {
 }
 
 class UserInfo {
-    constructor(uid, token, sign,apVersion,version,versionCode) {
+    constructor(uid, token, sign = "c00dda77d2c16df052516fdc603005a6", apVersion = "4.9.6", version = "4.0", versionCode = "496") {
         this.index = ++userIdx;
         this.uid = uid;
-        this.sign = sign || "c00dda77d2c16df052516fdc603005a6";
+        this.sign = sign;
         this.token = token; // 用户token
-        this.apVersion = apVersion || "4.9.6";
-        this.version = version || "4.0";
-        this.versionCode = versionCode || "496";
+        this.apVersion = apVersion;
+        this.version = version;
+        this.versionCode = versionCode;
         this.signinStatus = false; // 是否签到过
         this.ckStatus = true;
     }
@@ -75,17 +76,17 @@ class UserInfo {
     async cx() {
         try {
             let body = {
-                    "UID": `${this.uid}`,
-                    "Token": `${this.token}`,
-                    "Terminal": "1",
-                    "ApVersion": `${this.apVersion}`,
-                    "Method": "customer_getmoresetting",
-                    "Version": `${this.version}`,
-                    "AppFlag": 0,
-                    "Sign": `${this.sign}`,
-                    "ApTime": `${getTimeStr()}`,
-                    "ApVersionCode": `${this.versionCode}`,
-                };
+                "UID": `${this.uid}`,
+                "Token": `${this.token}`,
+                "Terminal": "1",
+                "ApVersion": `${this.apVersion}`,
+                "Method": "customer_getmoresetting",
+                "Version": `${this.version}`,
+                "AppFlag": 0,
+                "Sign": `${this.sign}`,
+                "ApTime": `${getTimeStr()}`,
+                "ApVersionCode": `${this.versionCode}`,
+            };
             const options = {
                 url: `https://mob2015.kekenet.com/keke/mobile/index.php`,
                 headers: {
@@ -131,18 +132,18 @@ class UserInfo {
         }
         try {
             let body = {
-                    "UID": `${this.uid}`,
-                    "Params": {},
-                    "Token": `${this.token}`,
-                    "Terminal": "1",
-                    "ApVersion": `${this.apVersion}`,
-                    "Method": "customer_sign",
-                    "Version": `${this.version}`,
-                    "AppFlag": 0,
-                    "Sign": `${this.sign}`,
-                    "ApTime": `${getTimeStr()}`,
-                    "ApVersionCode": `${this.apVersionCode}`,
-                };
+                "UID": `${this.uid}`,
+                "Params": {},
+                "Token": `${this.token}`,
+                "Terminal": "1",
+                "ApVersion": `${this.apVersion}`,
+                "Method": "customer_sign",
+                "Version": `${this.version}`,
+                "AppFlag": 0,
+                "Sign": `${this.sign}`,
+                "ApTime": `${getTimeStr()}`,
+                "ApVersionCode": `${this.apVersionCode}`,
+            };
             const options = {
                 //签到任务调用签到接口
                 url: `https://mob2015.kekenet.com/keke/mobile/index.php`,
@@ -160,10 +161,8 @@ class UserInfo {
             };
             //post方法
             let result = await httpRequest(options);
-            console.log(result)
             if (result?.Code === 200) {
                 $.log(`✅签到成功！获得${result?.Data?.point}积分！`);
-                $.signMsg = `${result?.msg}`;
                 this.signinStatus = true;
             } else {
                 $.log(`❌签到失败!${result?.Msg}`);
@@ -193,15 +192,14 @@ async function main() {
 //主程序执行入口
 !(async () => {
     //没有设置变量,执行Cookie获取
-    let isChecking=  ($.isNode() ? process.env[checkingName] : $.getdata(checkingName)) || ''
-    if (typeof $request != "undefined" && userCookie  === '' && isChecking === '') {
+    if (typeof $request != "undefined" && userCookie === '' && isChecking === '') {
         await getCookie();
         return;
     }
-//未检测到ck，退出
+    //未检测到ck，退出
     if (!(await checkEnv())) {
         throw new Error(`❌未检测到token，请添加环境变量`)
-        $.done(); 
+        $.done();
     }
     if (userList.length > 0) {
         await main();
@@ -209,7 +207,6 @@ async function main() {
 })()
     .catch((e) => $.log(e.message || e))//捕获登录函数等抛出的异常, 并把原因添加到全局变量(通知)
     .finally(async () => {
-    
         $.done(); //调用Surge、QX内部特有的函数, 用于退出脚本执行
     });
 
@@ -222,7 +219,7 @@ function padZero(n) {
 function getTimeStr() {
     // 获取时间戳
     let d = new Date();
-    return Math.floor(d.getTime()/1000);
+    return Math.floor(d.getTime() / 1000);
 }
 
 function getCurDate() {
