@@ -53,7 +53,7 @@ function padZero(n) {
 
 function getExpireStr() {
     let d = new Date();
-    let new_d = d.setHours(d.getMonth() + 6);
+    let new_d = d.setMonth(d.getMonth() + 6 +1);
     return new_d.getTime();
 }
 
