@@ -9,15 +9,15 @@
 
 function getExpireStr() {
     let d = new Date();
-    return d.setMonth(d.getMonth() + 6 + 1);
+    return d.setDate(d.getDate() + 30);
 }
 
 let body = $response.body;
 let obj = JSON.parse(body);
 if (obj?.Data?.is_vip === 0) {
-    obj['Data']['is_vip'] = 1;
+    obj['Data']['is_changxue'] = 1;
     obj['Data']['expire_time'] = getExpireStr();
-    obj['Data']['end_time'] = getExpireStr();
+    obj['Data']['changxue_end_time'] = getExpireStr();
 }
 body = JSON.stringify(obj);
 
