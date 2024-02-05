@@ -9,7 +9,7 @@
 
 function getExpireStr() {
     let d = new Date();
-    return d.setDate(d.getDate() + 30);
+    return d.setDate(d.getDate() + 30) / 1000;
 }
 
 let body = $response.body;
