@@ -19,9 +19,9 @@ if (obj?.Data?.is_vip === 0) {
     obj['ApTime'] = getExpireStr();
     obj['Data']['is_changxue'] = 1;
     obj['Data']['subscribe'] = 1;
-    obj['Data']['end_time'] = Math.floor(getExpireStr()/1000);
-    obj['Data']['expire_time'] = Math.floor(getExpireStr()/1000);
-    obj['Data']['changxue_end_time'] = Math.floor(getExpireStr()/1000);
+    obj['Data']['end_time'] = getExpireStr();
+    obj['Data']['expire_time'] = getExpireStr();
+    obj['Data']['changxue_end_time'] = getExpireStr();
 }
 body = JSON.stringify(obj);
 
