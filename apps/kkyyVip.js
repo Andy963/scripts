@@ -9,24 +9,20 @@
 
 function getExpireStr() {
     let d = new Date();
-    return d.setDate(d.getDate() + 30) / 1000;
+    return d.setDate(d.getDate() + 30);
 }
 
 let body = $response.body;
 let obj = JSON.parse(body);
 
-if(obj?.ApTime){
-    obj['ApTime'] = getExpireStr();
-}
-
 if (obj?.Data?.is_vip === 0) {
+    obj['ApTime'] = getExpireStr();
     obj['Data']['is_changxue'] = 1;
     obj['Data']['subscribe'] = 1;
-    obj['Data']['expire_time'] = getExpireStr();
-    obj['Data']['changxue_end_time'] = getExpireStr();
+    obj['Data']['end_time'] = Math.floor(getExpireStr()/1000);
+    obj['Data']['expire_time'] = Math.floor(getExpireStr()/1000);
+    obj['Data']['changxue_end_time'] = Math.floor(getExpireStr()/1000);
 }
 body = JSON.stringify(obj);
-
-console.log(body);
 
 $done(body);
