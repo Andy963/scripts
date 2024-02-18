@@ -26,6 +26,7 @@ async function main() {
             console.log(`随机延迟${user.getRandomTime()}ms`);
             await user.getRecord();
             await user.signin();
+            await user.signEx(user.getRandomNum(3));
             await user.sp();
             await user.cx();  //\n视频任务:${$.spp}\n
             DoubleLog(`签到:${$.signMsg}-本次获得：${user.curAward}积分:共：${user.totalAward}积分！\n`);
@@ -50,6 +51,9 @@ class UserInfo {
 
     getRandomTime() {
         return randomInt(1000, 3000)
+    }
+    getRandomNum(n=5){
+        return randomInt(1,n)
     }
 
     //签到函数
@@ -94,32 +98,34 @@ class UserInfo {
     }
 
  //签到额外
-    async signEx() {
-        try {
-            const options = {
-                //签到任务调用签到接口
-                url: `https://wemp.issks.com/lottery/v1/welfare/signIn/insertOurRecord`,
-                //请求头, 所有接口通用
-                headers: {
-                    'Accept-Encoding': "gzip,compress,br,deflate",
-                    "Content-Type": "application/json;charset=utf-8",
-                    "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.44(0x18002c2f) NetType/WIFI Language/zh_CN",
-                    "token": this.token,
-                    'Referer': "https://servicewechat.com/wx9a52264f55a86ce1/78/page-frame.html",
-                    'Host': "wemp.issks.com",
-                },
-            };
-            //post方法
-            let result = await httpRequest(options);
-            if (result?.success) {
-                $.log(`✅领取签到额外奖励成功！${result?.msg}`);
-                $.se = `${result?.msg}`;
-                this.curAward += 60;
-            } else {
-                $.log(`❌领取失败!${result?.msg}`);
+    async signEx(times=1) {
+        for(let i=0;i<times;i++){
+            try {
+                const options = {
+                    //签到任务调用签到接口
+                    url: `https://wemp.issks.com/lottery/v1/welfare/signIn/insertOurRecord`,
+                    //请求头, 所有接口通用
+                    headers: {
+                        'Accept-Encoding': "gzip,compress,br,deflate",
+                        "Content-Type": "application/json;charset=utf-8",
+                        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.44(0x18002c2f) NetType/WIFI Language/zh_CN",
+                        "token": this.token,
+                        'Referer': "https://servicewechat.com/wx9a52264f55a86ce1/78/page-frame.html",
+                        'Host': "wemp.issks.com",
+                    },
+                };
+                //post方法
+                let result = await httpRequest(options);
+                if (result?.success) {
+                    $.log(`✅领取签到额外奖励成功！${result?.msg}`);
+                    $.se = `${result?.msg}`;
+                    this.curAward += 60;
+                } else {
+                    $.log(`❌领取失败!${result?.msg}`);
+                }
+            } catch (e) {
+                console.log(e);
             }
-        } catch (e) {
-            console.log(e);
         }
     }
 
