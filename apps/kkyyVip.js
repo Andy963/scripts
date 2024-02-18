@@ -21,10 +21,10 @@ if (obj?.Data?.is_vip === 0) {
     obj['Data']['is_platinum'] = 2;
     obj['Data']['is_changxue'] =2;
     obj['Data']['subscribe'] = 2;
-    obj['Data']['expire_time'] = getExpireStr();
-    obj['Data']['end_time'] = getExpireStr();
-    obj['Data']['platinum_end_time'] = getExpireStr();
-    obj['Data']['changxue_end_time'] = getExpireStr();
+    obj['Data']['expire_time'] = -1;
+    obj['Data']['end_time'] = -1;
+    obj['Data']['platinum_end_time'] = -1;
+    obj['Data']['changxue_end_time'] = -1;
 }
 body = JSON.stringify(obj);
 
