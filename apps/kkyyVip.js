@@ -17,8 +17,8 @@ let obj = JSON.parse(body);
 
 if (obj?.Data?.is_vip === 0) {
     obj['ApTime'] = getExpireStr();
-    obj['Data']['is_vip'] = 2;
-    obj['Data']['is_platinum'] = 2;
+    obj['Data']['is_vip'] = 1;
+    obj['Data']['is_platinum'] = 1;
     obj['Data']['is_changxue'] =2;
     obj['Data']['subscribe'] = 2;
     obj['Data']['expire_time'] = -1;
